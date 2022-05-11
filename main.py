@@ -27,7 +27,7 @@ def get_args():
 
 
 def get_video_info(src, verbose=False):
-    cmd = 'ffprobe -loglevel 0 -print_format json -show_format -show_streams ' + src
+    cmd = 'ffprobe -loglevel 0 -print_format json -show_format -show_streams -select_streams v:0 ' + src
     out = check_output(cmd.split()).decode("utf-8")
     info = json.loads(out)
     if verbose:
