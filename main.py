@@ -109,7 +109,10 @@ def grab(video_path, output_dir, quality, start_time='00:00:00', end_time=None, 
 
 	# Output dir:
 	if output_dir is None:
-		pass
+		filename = os.path.basename(video_path).split('.')[0]
+		directory = os.path.dirname(video_path)
+		output_dir = os.path.join(directory, filename)
+
 	if not os.path.exists(output_dir):
 		# shutil.rmtree(output_dir)
 		os.makedirs(output_dir)
