@@ -50,6 +50,8 @@ def run_ffmpeg(src, dst, params):
     print(' '.join(cmd))
     subprocess.Popen(cmd).wait()
 
+    return cmd
+
 
 def timestamp_to_seconds(timestamp):
 	t = time.strptime(timestamp.split(',')[0],'%H:%M:%S')
@@ -116,10 +118,15 @@ def grab(video_path, output_dir, quality, start_time='00:00:00', end_time=None, 
 	if not os.path.exists(output_dir):
 		# shutil.rmtree(output_dir)
 		os.makedirs(output_dir)
-	output_dir = os.path.join(output_dir, '%6d.jpeg')
+	output_path = os.path.join(output_dir, '%6d.jpeg')
 
 	# ffmpeg:
-	run_ffmpeg(video_path, output_dir, params)
+	cmd = run_ffmpeg(video_path, output_path, params)
+
+	# Save log:
+	log_path = os.path.join(output_dir, 'grab_log.txt')
+	with open(log_path, 'w') as f:
+		f.write(' '.join(cmd))
 
 	print ('All done!')
 
