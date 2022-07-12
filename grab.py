@@ -23,6 +23,8 @@ def get_args():
                         help='The resolution of output frames, e.g. 1280x720, 1920x1080')
     parser.add_argument('--quality', '-q', dest='quality', type=int, default=2,
                         help='Output frame quality in the range 1-31, where 1 is the highest and 31 is the lowest')
+    parser.add_argument('--no-log', dest='log', action='store_false', default=True,
+                        help="Do not save log file")
     return parser.parse_args()
 
 
@@ -82,7 +84,7 @@ def calc_output_fps(video_path, start_time, end_time, num):
 	return fps
 
 
-def grab(video_path, output_dir, quality, start_time='00:00:00', end_time=None, num=None, resolution=None):
+def grab(video_path, output_dir, quality, start_time='00:00:00', end_time=None, num=None, resolution=None, log=True):
 	assert video_path, '[Error] Source video path not specified!'
 
 	params = []
@@ -124,9 +126,10 @@ def grab(video_path, output_dir, quality, start_time='00:00:00', end_time=None, 
 	cmd = run_ffmpeg(video_path, output_path, params)
 
 	# Save log:
-	log_path = os.path.join(output_dir, 'grab_log.txt')
-	with open(log_path, 'w') as f:
-		f.write(' '.join(cmd))
+	if log:
+		log_path = os.path.join(output_dir, 'grab_log.txt')
+		with open(log_path, 'w') as f:
+			f.write(' '.join(cmd))
 
 	print ('All done!')
 
@@ -142,5 +145,6 @@ if __name__ == '__main__':
 		start_time=args.start_time,
 		end_time=args.end_time,
 		num=args.num,
-		resolution=args.resolution
+		resolution=args.resolution,
+		log=args.log
 	)
