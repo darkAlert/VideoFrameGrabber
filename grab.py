@@ -64,7 +64,7 @@ def timestamp_to_seconds(timestamp):
 
 def calc_output_fps(video_path, start_time, end_time, num):
 	# Get video duration and fps:
-	info = get_video_info(args.video_path)
+	info = get_video_info(video_path)
 	video_duration = float(info['streams'][0]['duration'])
 	n,d = info['streams'][0]['avg_frame_rate'].split('/')
 	video_fps = float(n) / float(d)
