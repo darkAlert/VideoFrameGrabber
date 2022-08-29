@@ -19,6 +19,8 @@ def get_args():
                         help='End time of video segment')
     parser.add_argument('--num', '-n', dest='num', type=int, default=None,
                         help='Output number of frames')
+    parser.add_argument('--fps', dest='fps', type=int, default=None,
+                        help='Output FPS. The argument can only be used when --num is None')
     parser.add_argument('--resolution', '-r', dest='resolution', type=str, default=None,
                         help='The resolution of output frames, e.g. 1280x720, 1920x1080')
     parser.add_argument('--quality', '-q', dest='quality', type=int, default=2,
@@ -84,8 +86,9 @@ def calc_output_fps(video_path, start_time, end_time, num):
 	return fps
 
 
-def grab(video_path, output_dir, quality, start_time='00:00:00', end_time=None, num=None, resolution=None, log=True):
+def grab(video_path, output_dir, quality, start_time='00:00:00', end_time=None, num=None, fps=None, resolution=None, log=True):
 	assert video_path, '[Error] Source video path not specified!'
+	assert num is None or fps is None, '[Error] The --fps argument can only be used when --num is None!'
 
 	params = []
 
@@ -101,6 +104,8 @@ def grab(video_path, output_dir, quality, start_time='00:00:00', end_time=None, 
 		fps = calc_output_fps(video_path, start_time, end_time, num)
 
 		# Set FPS:
+		params.append('-vf fps={}'.format(fps))
+	elif fps is not None:
 		params.append('-vf fps={}'.format(fps))
 
 	# Output resolution:
@@ -145,6 +150,7 @@ if __name__ == '__main__':
 		start_time=args.start_time,
 		end_time=args.end_time,
 		num=args.num,
+		fps=args.fps,
 		resolution=args.resolution,
 		log=args.log
 	)
