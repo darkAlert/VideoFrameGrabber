@@ -18,6 +18,7 @@ Video Frame Grabber is a tool to grab frames from video using ffmpeg
 
 ## Running
 `python3 main.py -v='path\to\video.mp4'`
+
 By default, results (JPEG images) will be saved to `path\to\video\`
 
 ### Parameters
