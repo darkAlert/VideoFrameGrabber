@@ -8,53 +8,53 @@ from subprocess import check_output
 
 
 def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--video_path', '-v', dest='video_path', type=str, default=None,
-                        help='Path to source video file')
-    parser.add_argument('--output_dir', '-o', dest='output_dir', type=str, default=None,
-                        help='Path to output directory where frames will be saved. Can be empty')
-    parser.add_argument('--start_time', '-st', dest='start_time', type=str, default='00:00:00',
-                        help='Start time of video segment')
-    parser.add_argument('--end_time', '-et', dest='end_time', type=str, default=None,
-                        help='End time of video segment')
-    parser.add_argument('--num', '-n', dest='num', type=int, default=None,
-                        help='Output number of frames')
-    parser.add_argument('--fps', dest='fps', type=int, default=None,
-                        help='Output FPS. The argument can only be used when --num is None')
-    parser.add_argument('--resolution', '-r', dest='resolution', type=str, default=None,
-                        help='The resolution of output frames, e.g. 1280x720, 1920x1080')
-    parser.add_argument('--quality', '-q', dest='quality', type=int, default=2,
-                        help='Output frame quality in the range 1-31, where 1 is the highest and 31 is the lowest')
-    parser.add_argument('--no-log', dest='log', action='store_false', default=True,
-                        help="Do not save log file")
-    return parser.parse_args()
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--video_path', '-v', dest='video_path', type=str, default=None,
+						help='Path to source video file')
+	parser.add_argument('--output_dir', '-o', dest='output_dir', type=str, default=None,
+						help='Path to output directory where frames will be saved. Can be empty')
+	parser.add_argument('--start_time', '-st', dest='start_time', type=str, default='00:00:00',
+						help='Start time of video segment')
+	parser.add_argument('--end_time', '-et', dest='end_time', type=str, default=None,
+						help='End time of video segment')
+	parser.add_argument('--num', '-n', dest='num', type=int, default=None,
+						help='Output number of frames')
+	parser.add_argument('--fps', dest='fps', type=int, default=None,
+						help='Output FPS. The argument can only be used when --num is None')
+	parser.add_argument('--resolution', '-r', dest='resolution', type=str, default=None,
+						help='The resolution of output frames, e.g. 1280x720, 1920x1080')
+	parser.add_argument('--quality', '-q', dest='quality', type=int, default=2,
+						help='Output frame quality in the range 1-31, where 1 is the highest and 31 is the lowest')
+	parser.add_argument('--no-log', dest='log', action='store_false', default=True,
+						help="Do not save log file")
+	return parser.parse_args()
 
 
 def get_video_info(src, verbose=False):
-    cmd = 'ffprobe -loglevel 0 -print_format json -show_format -show_streams -select_streams v:0 ' + src
-    out = check_output(cmd.split()).decode("utf-8")
-    info = json.loads(out)
-    if verbose:
-        print (out)
+	cmd = 'ffprobe -loglevel 0 -print_format json -show_format -show_streams -select_streams v:0 ' + src
+	out = check_output(cmd.split()).decode("utf-8")
+	info = json.loads(out)
+	if verbose:
+		print (out)
 
-    return info
+	return info
 
 
 def run_ffmpeg(src, dst, params):
-    if src is not None:
-        cmd = ['ffmpeg', '-i', src]
-    else:
-        cmd = ['ffmpeg']
+	if src is not None:
+		cmd = ['ffmpeg', '-i', src]
+	else:
+		cmd = ['ffmpeg']
 
-    for p in params:
-    	cmd += p.split()
+	for p in params:
+		cmd += p.split()
 
-    cmd += [dst]
+	cmd += [dst]
 
-    print(' '.join(cmd))
-    subprocess.Popen(cmd).wait()
+	print(' '.join(cmd))
+	subprocess.Popen(cmd).wait()
 
-    return cmd
+	return cmd
 
 
 def timestamp_to_seconds(timestamp):
