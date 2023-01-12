@@ -97,7 +97,7 @@ def run_video_concat_with_ffmpeg(src_files, dst_file, codec=None, fps=None, pres
 
 
 def run_video_with_ffmpeg(src_file, dst_file, codec=None, fps=None, preset=None,
-                          scale_720=False, bitrate=None, max_bitrate=None):
+                          scale_720=False, bitrate=None, max_bitrate=None, start=None, end=None):
     '''
     :param src_file:   Source video path
     :param dst_file:   Destination video path
@@ -157,9 +157,14 @@ def run_video_with_ffmpeg(src_file, dst_file, codec=None, fps=None, preset=None,
     if len(filters) > 0:
         filters = ' -vf {}'.format(filters)
 
+    if start is not None:
+        params += ' -ss {}'.format(start)
+    if end is not None:
+        params += ' -to {}'.format(end)
+
     # Re-encoding video params:
     v_only_copy = False
-    if  len(filters) > 0:
+    if  len(filters) > 0 or start is not None or end is not None:
         params += ' -codec:v {} -bf 0'.format(codec) + filters
     elif 'h264' not in v_codec:
         params += ' -codec:v {} -bf 0'.format(codec)
@@ -184,7 +189,7 @@ def run_video_with_ffmpeg(src_file, dst_file, codec=None, fps=None, preset=None,
         params += ' -preset {}'.format(preset)
 
     # Video encoding bitrate:
-    if bitrate is not None and v_only_copy:
+    if bitrate is not None and not v_only_copy:
         params += ' -b:v {}'.format(bitrate)
 
     # Run ffmpeg:
@@ -207,13 +212,16 @@ def sort_by_name(names):
 
 
 def main(src_folder, dst_folder, status_folder, extract_only, codec, fps,
-         preset, bitrate, max_bitrate, scale_720, dst_format='.mp4'):
+         preset, bitrate, max_bitrate, scale_720, dst_format='.mp4', start=None, end=None, file=None):
     start_time = datetime.now()
 
-    src_files = [f for f in os.listdir(src_folder)]
+    if file is None:
+        src_files = [f for f in os.listdir(src_folder)]
+    else:
+        src_files = [file]
 
-    single_src_files = [name for name in src_files if '__' not in name]
-    multiple_files = sort_by_name([name for name in src_files if '__' in name])
+    single_src_files = src_files
+    multiple_files = {} #sort_by_name([name for name in src_files if '__' in name])
 
     if not os.path.exists(dst_folder):
         os.makedirs(dst_folder)
@@ -228,7 +236,7 @@ def main(src_folder, dst_folder, status_folder, extract_only, codec, fps,
             dst = os.path.join(dst_folder, change_ext(name, dst_format))
             dst = dst.replace('_orig', '')
             run_video_with_ffmpeg(src, dst, codec, fps, preset=preset, scale_720=scale_720,
-                                  bitrate=bitrate, max_bitrate=max_bitrate)
+                                  bitrate=bitrate, max_bitrate=max_bitrate, start=start, end=end)
             results.append(dst)
         # convert games recorded in multiple files
         for base_name, sources in multiple_files.items():
@@ -260,6 +268,8 @@ def parse_args():
                         help='Folder with source video(-s)')
     parser.add_argument('destination_video_folder',
                         help='Folder where to save resulting video file(-s)')
+    parser.add_argument('--file', type=str, default=None,
+                        help='Name of the video file to process only it')
     parser.add_argument('-b', '--bitrate', type=str, default=None,
                         help='Specific bitrate for video conversion (b=3.3M for GPU is perfect)')
     parser.add_argument('-mb', '--max_bitrate', type=int, default=MAX_VIDEO_BITRATE,
@@ -274,6 +284,10 @@ def parse_args():
                         help='Just extract frames from provided videos')
     parser.add_argument('-c', '--codec', type=str, default='h264',
                         help='Codec name for converting video stream (h264 for CPU and h264_nvenc for GPU)')
+    parser.add_argument('-ss', '--start', type=str, default=None,
+                        help='Video start time')
+    parser.add_argument('-to', '--end', type=str, default=None,
+                        help='Video end time')
     feature_parser = parser.add_mutually_exclusive_group(required=False)
     feature_parser.add_argument('-s720', '--scale-720', dest='scale_720', action='store_true',
                                 help='Scale to 720 pixels in height, and automatically choose width')
@@ -290,4 +304,7 @@ if __name__ == "__main__":
          preset=args.preset,
          bitrate=args.bitrate,
          max_bitrate=args.max_bitrate,
-         scale_720=args.scale_720)
+         scale_720=args.scale_720,
+         start=args.start,
+         end=args.end,
+         file=args.file)
