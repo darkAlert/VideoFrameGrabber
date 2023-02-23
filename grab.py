@@ -13,7 +13,7 @@ def get_args():
 						help='Path to source video file')
 	parser.add_argument('--output_dir', '-o', dest='output_dir', type=str, default=None,
 						help='Path to output directory where frames will be saved. Can be empty')
-	parser.add_argument('--start_time', '-st', dest='start_time', type=str, default='00:00:00',
+	parser.add_argument('--start_time', '-st', dest='start_time', type=str, default=None,
 						help='Start time of video segment')
 	parser.add_argument('--end_time', '-et', dest='end_time', type=str, default=None,
 						help='End time of video segment')
@@ -86,9 +86,14 @@ def calc_output_fps(video_path, start_time, end_time, num):
 	return fps
 
 
-def grab(video_path, output_dir, quality, start_time='00:00:00', end_time=None, num=None, fps=None, resolution=None, log=True):
+def grab(video_path, output_dir, quality, start_time=None, end_time=None, num=None, fps=None, resolution=None, log=True):
 	assert video_path, '[Error] Source video path not specified!'
 	assert num is None or fps is None, '[Error] The --fps argument can only be used when --num is None!'
+
+	if start_time is None or len(start_time) == 0:
+		start_time = '00:00:00'
+	if end_time is not None and len(end_time) == 0:
+		end_time = None
 
 	params = []
 
